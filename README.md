@@ -11,3 +11,9 @@ Requirements installed PHP 8.3 and COMPOSER v2
 7. npm run build
 8. docker-compose up
 9. http://127.0.0.1:8001/ in browser
+
+TODO:
+1. login and registration
+2. add to favourite to database
+3. add vue component
+4. customize docker-compose file for composer install and npm install
