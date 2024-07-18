@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\PokemonApiException;
 use App\Facades\FavouritesFacade;
 use App\Services\PokemonApiInterface;
 use Illuminate\Http\Request;
@@ -21,9 +22,13 @@ class PokemonController extends Controller
      */
     public function index(Request $request)
     {
-        $data = $this->pokemonApiService->list($request, 100);
+        try {
+            $data = $this->pokemonApiService->list($request, 100);
+            return view('pokemons.index', $data);
 
-        return view('pokemons.index', $data);
+        } catch (PokemonApiException $e) {
+            return back()->withError('Failed to fetch Pokemon details. Please try again later.');
+        }
     }
 
     /**
@@ -34,9 +39,13 @@ class PokemonController extends Controller
     {
         $favorites = FavouritesFacade::all();
 
-        $pokemon = $this->pokemonApiService->details($name);
+        try {
+            $pokemon = $this->pokemonApiService->details($name);
+            return view('pokemons.show', compact('pokemon', 'favorites'));
 
-        return view('pokemons.show', compact('pokemon', 'favorites'));
+        } catch (PokemonApiException $e) {
+            return back()->withError('Failed to fetch Pokemon details. Please try again later.');
+        }
     }
 
     /**

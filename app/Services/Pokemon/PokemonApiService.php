@@ -2,6 +2,7 @@
 
 namespace App\Services\Pokemon;
 
+use App\Exceptions\PokemonApiException;
 use App\Services\PokemonApiInterface;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ class PokemonApiService implements PokemonApiInterface
      * @param Request $request
      * @param $limit
      * @return array
+     * @throws PokemonApiException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function list(Request $request, $limit = 100): array
@@ -33,12 +35,16 @@ class PokemonApiService implements PokemonApiInterface
         $page   = $request->input('page', 1);
         $offset = ($page - 1) * $limit;
 
-        $response = $this->client->get('pokemon', [
-            'query' => [
-                'limit' => $limit,
-                'offset' => $offset,
-            ]
-        ]);
+        try {
+            $response = $this->client->get('pokemon', [
+                'query' => [
+                    'limit' => $limit,
+                    'offset' => $offset,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            throw new PokemonApiException('Error communicating with PokeAPI: ' . $e->getMessage());
+        }
 
         $data = json_decode($response->getBody()->getContents(), true);
 
@@ -60,12 +66,19 @@ class PokemonApiService implements PokemonApiInterface
 
     /**
      * @param string $name
-     * @return mixed
+     * @return array
+     * @throws PokemonApiException
      */
     public function details($name = ''): array
     {
         return Cache::remember(self::CACHE_POKEMON . $name, 60*60, function() use ($name) {
-            $response = $this->client->get('pokemon/' . $name);
+
+            try {
+                $response = $this->client->get('pokemon/' . $name);
+            } catch (\Exception $e) {
+                throw new PokemonApiException('Error communicating with PokeAPI: ' . $e->getMessage());
+            }
+
             return json_decode($response->getBody()->getContents(), true);
         });
     }
