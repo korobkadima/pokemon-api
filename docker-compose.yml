@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
     laravel.test:
-        #image: laravelsail/php80-composer:latest
         image: sail-8.3/app
         ports:
             - '8001:80'
