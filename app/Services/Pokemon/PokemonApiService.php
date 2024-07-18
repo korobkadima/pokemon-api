@@ -31,7 +31,7 @@ class PokemonApiService implements PokemonApiInterface
      */
     public function list(Request $request, $limit = 100): array
     {
-        $search = $request->input('search');
+        $search = trim($request->input('search'));
         $page   = $request->input('page', 1);
         $offset = ($page - 1) * $limit;
 
