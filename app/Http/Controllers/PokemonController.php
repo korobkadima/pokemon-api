@@ -66,6 +66,7 @@ class PokemonController extends Controller
      */
     public function favorites(Request $request)
     {
+        $pokemons  = [];
         $favorites = FavouritesFacade::all();
 
         foreach ($favorites as $name) {
